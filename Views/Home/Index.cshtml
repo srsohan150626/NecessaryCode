@@ -1,0 +1,91 @@
+﻿@model AuditViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<form asp-action="Add" method="post" >
+    <div class="col-md-12">
+        <div class="form row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form_label" for="Office_Order">Auditor Name</label><span class="validate_data">*</span>
+                    <div id="auditorNameFields">
+                        <div class="d-flex">
+                            <input type="text" class="form-control flex-grow-1" name="Auditors[0].Name" />
+                            <button type="button" class="btn btn-primary add-auditor-btn ml-4" title="Add">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form_label" for="Zone_Name">Select Audit Leader</label><span class="validate_data">*</span>
+                    <select id="auditLeader" class="form-select w-100" asp-for="AuditLeader">
+                        <option>Select Audit Leader</option>
+
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <button class="btn btn-primary" type="submit">Add</button>
+</form>
+@section Scripts{
+    <script>
+        var auditorNameIndex = 1;
+        var auditorNames = [];
+
+        $('.add-auditor-btn').click(function () {
+            var newAuditorName = $('input[name="Auditors[' + (auditorNameIndex - 1) + '].Name"]').val(); // Get value of previous auditor input
+            if (newAuditorName != "") {
+                auditorNames.push(newAuditorName);
+                updateAuditLeaderDropdown();
+
+                var newAuditorNameField = `<div class="mt-4 d-flex" >
+                                <input type="text" class="form-control flex-grow-1" name = "Auditors[${auditorNameIndex}].Name" />
+                                    <button type="button" class="btn btn-danger remove-auditor-btn ml-4" title = "Remove" > -</button>
+                                        </div>`
+                  
+                    ;
+                $('#auditorNameFields').append(newAuditorNameField);
+                auditorNameIndex++;
+            } else {
+                alert("Please enter an auditor name before adding.");
+            }
+        });
+        $(document).on('click', '.remove-auditor-btn', function () {
+            var auditorName = $(this).siblings('input').val(); // Get the auditor name to be removed
+            auditorNames = auditorNames.filter(function (name) { return name !== auditorName; }); // Remove from array
+            updateAuditLeaderDropdown(); // Update dropdown
+            $(this).parent().remove();
+            auditorNameIndex--;
+            // Re-index the remaining auditor input fields
+            reindexAuditorFields();
+        });
+        function reindexAuditorFields() {
+            $('#auditorNameFields > div').each(function (index) {
+                $(this).find('input').attr('name', 'Auditors[' + index + '].Name');
+            });
+
+            // Update the auditorNames array to match the new indices
+            auditorNames = $('#auditorNameFields input').map(function () {
+                return $(this).val();
+            }).get();
+        }
+        function updateAuditLeaderDropdown() {
+            var $auditLeader = $('#auditLeader');
+            $auditLeader.empty();
+            $auditLeader.append('<option value="">Select Audit Leader</option>');
+
+            // Populate dropdown with auditor names
+            auditorNames.forEach(function (auditorName) {
+                if (auditorName.trim() !== ""){
+                    $auditLeader.append('<option value="' + auditorName + '">' + auditorName + '</option>');
+                }
+               
+            });
+        }
+
+    </script>
+}
