@@ -18,9 +18,9 @@ namespace ProjectPractise.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Add(AuditViewModel model)
+        public IActionResult Index(AuditViewModel model)
         {
-            return View();
+            return View(model);
         }
         public IActionResult Privacy()
         {
